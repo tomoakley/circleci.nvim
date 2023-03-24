@@ -117,7 +117,7 @@ local function get_workflow()
       vim.keymap.set('n', 'O', function ()
         auth.openJobUrl(jobsValue["job_number"])
       end, {
-        nowait = true, noremap = true, silent = true
+        nowait = true, noremap = true, silent = true, buffer = buf
       })
       --api.nvim_buf_set_extmark(buf, ns, r+jobsKey, c, {end_row = r+jobsKey, virt_text = {{jobsValue["status"]}}})
     end
@@ -139,7 +139,7 @@ local function set_mappings()
 
   for k,v in pairs(mappings) do
     vim.keymap.set('n', k, v, {
-      nowait = true, noremap = true, silent = true
+      nowait = true, noremap = true, silent = true, buffer = buf
     })
   end
   local other_chars = {

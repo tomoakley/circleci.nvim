@@ -8,7 +8,6 @@ local M = {}
 M.setup = function(args)
   -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
   -- you can also put some validation here for those.
-  print('circleci-nvim', args["project_slug"])
   config.config = args
 end
 
