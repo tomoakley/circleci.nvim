@@ -1,7 +1,5 @@
 local auth = require'nvim-circleci.auth'
-local Job = require'plenary.job'
 -- module represents a lua module for the plugin
-local M = {}
 local api = vim.api
 local buf, win
 

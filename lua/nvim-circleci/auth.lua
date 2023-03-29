@@ -30,7 +30,7 @@ function auth.getMyPipelineIds()
   for k,v in pairs(data) do
     if (k == "items") then
       for _, item in ipairs(v) do
-        pipelineIds[#pipelineIds + 1] = {branch = item.vcs.branch, id = item.id, number = item.number}
+        pipelineIds[#pipelineIds + 1] = {branch = item.vcs.branch, id = item.id, number = item.number, updated_at = item.updated_at}
       end
     end
   end
