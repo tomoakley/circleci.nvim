@@ -30,7 +30,7 @@ function auth.getMyPipelineIds()
   for k,v in pairs(data) do
     if (k == "items") then
       for _, item in ipairs(v) do
-        pipelineIds[#pipelineIds + 1] = {branch = item.vcs.branch, id = item.id, number = item.number, updated_at = item.updated_at}
+        pipelineIds[#pipelineIds + 1] = {branch = item.vcs.branch, id = item.id, number = item.number, updated_at = item.updated_at, state = item.state}
       end
     end
   end
@@ -71,6 +71,10 @@ function auth.openJobUrl(number)
       vim.cmd('silent exec "!open \'' .. v .. '\'"')
     end
   end
+end
+
+function auth.run(request, params, cb)
+  cb(request(params))
 end
 
 

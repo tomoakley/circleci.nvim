@@ -3,12 +3,13 @@ local finders = require("telescope.finders")
 local actions = require("telescope.actions")
 local state = require("telescope.state")
 local conf = require("telescope.config").values
-local utils = require("telescope.utils")
 local previewers = require("telescope.previewers")
 local action_set = require "telescope.actions.set"
 local action_state = require "telescope.actions.state"
 
+
 local auth = require'nvim-circleci.auth'
+local utils = require'nvim-circleci.utils'
 --local previewers = require 'nvim-circleci.telescope.previewers'
 
 local function open_preview_buffer(command)
@@ -38,22 +39,24 @@ local get_pipelines = function(opts)
   opts = opts or {}
   local pipelines = auth.getMyPipelineIds()
   local widths = {
-    branch = 50,
+    branch = 36,
     updated_at = 16,
-    number = 10,
+    number = 6,
   }
   local displayer = require("telescope.pickers.entry_display").create {
         separator = " ",
         items = {
-            { width = widths.branch },
             { width = widths.number },
+            { width = widths.branch },
+            { remaining = true },
         },
     }
   local make_display = function(entry)
     -- local workflow = auth.getWorkflowById(entry.id)
     return displayer {
-      { entry.branch },
-      { tostring(entry.number) },
+      { tostring(entry.number), "TelescopeResultsNumber" },
+      { entry.branch, remaining = true },
+      { utils.prettyDateTime(entry.updated_at), "Comment" }
     }
   end
   pickers.new(opts or {}, {
@@ -91,12 +94,13 @@ local get_pipelines = function(opts)
             vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
               '%s, %s', v["name"], v["status"]
             )})
-            local workflowJobs = auth.getWorkflowJobs(v['id'])
-            for jobsKey, jobsValue in ipairs(workflowJobs) do
-              vim.api.nvim_buf_set_lines(bufnr, k+jobsKey-1, k+jobsKey, false, {string.format(
-                '    %s, %s, %s, %s', jobsValue["name"], jobsValue["status"], jobsValue['job_number'], jobsValue['started_at']
-              )})
-            end
+            auth.run(auth.getWorkflowJobs, v['id'], function(workflowJobs)
+                for jobsKey, jobsValue in ipairs(workflowJobs) do
+                  vim.api.nvim_buf_set_lines(bufnr, k+jobsKey-1, k+jobsKey, false, {string.format(
+                    '    %s, %s, %s, %s', jobsValue["name"], jobsValue["status"], jobsValue['job_number'], jobsValue['started_at']
+                  )})
+                end
+            end)
           end
           vim.api.nvim_buf_set_option(bufnr, "filetype", "circleci")
         end
