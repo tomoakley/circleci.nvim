@@ -35,11 +35,12 @@ local open_branch_workflows_in_browser = function()
     print(vim.inspect(entry))
 end
 
-local get_my_pipelines = function(opts)
+local get_pipelines = function(opts, mineOrAll)
   opts = opts or {}
-  local pipelines = auth.getMyPipelineIds()
+  local pipelines = mineOrAll == "mine" and auth.getMyPipelineIds() or auth.getAllPipelineIds()
   local widths = {
-    branch = 36,
+    branch = 20,
+    user = 16,
     updated_at = 16,
     number = 6,
   }
@@ -47,7 +48,8 @@ local get_my_pipelines = function(opts)
         separator = " ",
         items = {
             { width = widths.number },
-            { width = widths.branch },
+            { width = mineOrAll == "all" and widths.branch or widths.branch + widths.user },
+            { width = mineOrAll == "all" and widths.user or 0 },
             { remaining = true },
         },
     }
@@ -56,6 +58,7 @@ local get_my_pipelines = function(opts)
     return displayer {
       { tostring(entry.number), "TelescopeResultsNumber" },
       { entry.branch, remaining = true },
+      { mineOrAll == "all" and entry.user or "" },
       { utils.prettyDateTime(entry.updated_at), "Comment" }
     }
   end
@@ -65,7 +68,7 @@ local get_my_pipelines = function(opts)
       results = pipelines,
       entry_maker = function(entry)
           entry.value = entry.branch
-          entry.ordinal = entry.branch
+          entry.ordinal = tostring(entry.number)
           entry.display = make_display
           return entry
       end,
@@ -112,8 +115,12 @@ end
 
 return require("telescope").register_extension({
   exports = {
-      get_my_pipelines = get_my_pipelines
-      -- get_all_pipelines
+      get_my_pipelines = function(opts)
+        get_pipelines(opts, "mine")
+      end,
+      get_all_pipelines = function(opts)
+        get_pipelines(opts, "all")
+      end
       -- get_workflows_for_current_branch
       -- get_master_workflows
       -- get_workflows_for_branch

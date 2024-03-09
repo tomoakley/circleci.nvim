@@ -37,6 +37,20 @@ function auth.getMyPipelineIds()
   return pipelineIds
 end
 
+function auth.getAllPipelineIds()
+  local pipelineIds = {}
+  local response = makeRequest("GET", string.format("project/%s/pipeline", config.config['project_slug']))
+  local data = vim.json.decode(response)
+  for k,v in pairs(data) do
+    if (k == "items") then
+      for _, item in ipairs(v) do
+        pipelineIds[#pipelineIds + 1] = {branch = item.vcs.branch, id = item.id, number = item.number, updated_at = item.updated_at, state = item.state, user = item.trigger.actor.login}
+      end
+    end
+  end
+  return pipelineIds
+end
+
 function auth.getWorkflowById(id)
   local response = makeRequest("GET", string.format("pipeline/%s/workflow", id))
   local data = vim.json.decode(response)

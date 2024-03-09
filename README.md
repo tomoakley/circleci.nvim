@@ -30,4 +30,9 @@ To show your pipelines in a telescope window and preview their status, run this 
 ```
 lua require('telescope').extensions.circleci.get_my_pipelines()
 ```
+To show all the projects pipelines from every user, run this command:
+```
+lua require('telescope').extensions.circleci.get_all_pipelines()
+```
+
 
