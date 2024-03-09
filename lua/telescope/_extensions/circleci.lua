@@ -35,7 +35,7 @@ local open_branch_workflows_in_browser = function()
     print(vim.inspect(entry))
 end
 
-local get_pipelines = function(opts)
+local get_my_pipelines = function(opts)
   opts = opts or {}
   local pipelines = auth.getMyPipelineIds()
   local widths = {
@@ -112,6 +112,10 @@ end
 
 return require("telescope").register_extension({
   exports = {
-      get_pipelines = get_pipelines
+      get_my_pipelines = get_my_pipelines
+      -- get_all_pipelines
+      -- get_workflows_for_current_branch
+      -- get_master_workflows
+      -- get_workflows_for_branch
   }
 })

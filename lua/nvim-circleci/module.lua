@@ -1,4 +1,4 @@
-local auth = require'nvim-circleci.auth'
+--[[ local auth = require'nvim-circleci.auth'
 -- module represents a lua module for the plugin
 local api = vim.api
 local buf, win
@@ -164,4 +164,4 @@ end
 
 return {
   my_first_function = my_first_function,
-}
+} ]]

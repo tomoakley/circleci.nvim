@@ -19,9 +19,6 @@ require('nvim-circleci').setup{
 
 where `project_slug` comes from Circle in the format `vcs-slug/org-name/repo-name`. For example, `gh/facebook/react'.
 
-## Commands
-`:CCMyPipelines` - show your pipelines in a popup buffer. Press Enter on a pipeline to show the workflow and jobs. Press `O` to open the workflow in the browser (currently opens the wrong job - but in the correct workflow)
-
 ## Telescope
 To activate the Telescope extension add this to your vimrc:
 ```
@@ -31,6 +28,6 @@ require("telescope").load_extension("circleci")
 ### View your pipelines
 To show your pipelines in a telescope window and preview their status, run this command:
 ```
-lua require('telescope').extensions.circleci.get_pipelines()
+lua require('telescope').extensions.circleci.get_my_pipelines()
 ```
 

@@ -11,8 +11,8 @@ M.setup = function(args)
   config.config = args
 end
 
-M.getMyPipelines = function()
+--[[ M.getMyPipelines = function()
   module.my_first_function()
-end
+end ]]
 
 return M
