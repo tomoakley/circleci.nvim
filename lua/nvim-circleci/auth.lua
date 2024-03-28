@@ -58,7 +58,7 @@ function auth.getWorkflowById(id)
   for k,v in pairs(data) do
     if (k == "items") then
       for _, item in ipairs(v) do
-        workflowData[#workflowData+1] = {id = item.id, status = item.status, name = item.name, created_at = item.created_at}
+        workflowData[#workflowData+1] = {id = item.id, status = item.status, name = item.name, created_at = item.created_at, number = item.pipeline_number}
       end
     end
   end
@@ -75,6 +75,18 @@ function auth.getWorkflowJobs(id)
     end
   end
   return items
+end
+
+function auth.getWorkflowForBranch(sender, branch)
+  local pipelines = auth.getAllPipelineIds()
+  -- local branchWorkflows = {}
+  for key,item in pairs(pipelines) do
+    if (item.branch == branch) then
+      local workflow = auth.getWorkflowById(item.id)
+      -- branchWorkflows[#branchWorkflows+1] = workflow
+      sender(workflow)
+    end
+  end
 end
 
 function auth.openJobUrl(number)

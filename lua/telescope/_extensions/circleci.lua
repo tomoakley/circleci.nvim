@@ -7,7 +7,6 @@ local previewers = require("telescope.previewers")
 local action_set = require "telescope.actions.set"
 local action_state = require "telescope.actions.state"
 
-
 local auth = require'nvim-circleci.auth'
 local utils = require'nvim-circleci.utils'
 --local previewers = require 'nvim-circleci.telescope.previewers'
@@ -33,6 +32,24 @@ end
 local open_branch_workflows_in_browser = function()
     local entry = action_state.get_selected_entry()
     print(vim.inspect(entry))
+end
+
+local createPreview = function(bufnr, entry)
+  vim.defer_fn(function()
+    local workflow = auth.getWorkflowById(entry.id)
+    for k,v in ipairs(workflow) do
+      vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
+        '%s, %s', v["name"], v["status"]
+      )})
+      auth.run(auth.getWorkflowJobs, v['id'], function(workflowJobs)
+          for jobsKey, jobsValue in ipairs(workflowJobs) do
+            vim.api.nvim_buf_set_lines(bufnr, k+jobsKey-1, k+jobsKey, false, {string.format(
+              '    %s, %s, %s, %s', jobsValue["name"], jobsValue["status"], jobsValue['job_number'], jobsValue['started_at']
+            )})
+          end
+      end)
+    end
+  end, 0)
 end
 
 local get_pipelines = function(opts, mineOrAll)
@@ -90,23 +107,11 @@ local get_pipelines = function(opts, mineOrAll)
         return entry.value
       end,
       define_preview = function(self, entry)
-        local workflow = auth.getWorkflowById(entry.id)
         local bufnr = self.state.bufnr
         if vim.api.nvim_buf_is_valid(bufnr) then
-          for k,v in ipairs(workflow) do
-            vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
-              '%s, %s', v["name"], v["status"]
-            )})
-            auth.run(auth.getWorkflowJobs, v['id'], function(workflowJobs)
-                for jobsKey, jobsValue in ipairs(workflowJobs) do
-                  vim.api.nvim_buf_set_lines(bufnr, k+jobsKey-1, k+jobsKey, false, {string.format(
-                    '    %s, %s, %s, %s', jobsValue["name"], jobsValue["status"], jobsValue['job_number'], jobsValue['started_at']
-                  )})
-                end
-            end)
-          end
-          vim.api.nvim_buf_set_option(bufnr, "filetype", "circleci")
+          vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
         end
+        createPreview(bufnr, entry)
       end,
     }
 
@@ -120,9 +125,6 @@ return require("telescope").register_extension({
       end,
       get_all_pipelines = function(opts)
         get_pipelines(opts, "all")
-      end
-      -- get_workflows_for_current_branch
-      -- get_master_workflows
-      -- get_workflows_for_branch
+      end,
   }
 })
