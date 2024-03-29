@@ -13,10 +13,7 @@ Ensure you have a CircleCI user token in your macOS keychain (sorry, does not su
 Currently this plugin only officially supports Github as the source control provider for the project on CircleCI. Gitlab and Bitbucket are in the `providerMap` in [`lua/nvim-circleci.lua`](https://github.com/tomoakley/circleci.nvim/blob/main/lua/nvim-circleci.lua), but I am unable to test them. If they don't work, please open an issue, or even better make a pull request with a fix!
 
 ## Telescope
-To activate the Telescope extension add this to your vimrc:
-```
-require("telescope").load_extension("circleci")
-```
+The Telescope extension is only activated by the plugin if the project root has a `.circleci` directory.
 
 ### View your pipelines
 To show your pipelines in a telescope window and preview their status, run this command:

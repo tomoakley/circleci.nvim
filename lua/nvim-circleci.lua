@@ -11,10 +11,20 @@ local providerMap = {
     ["git@bitbucket.org"] = "bb",
 }
 
-local function getRemoteOriginUrl()
+local function getTopLevelOfRepo()
   local handle = io.popen("git rev-parse --show-toplevel")
   local repoRoot = handle:read("*a")
   handle:close()
+  return repoRoot
+end
+
+local function checkForCircleCIConfig(root)
+  local circleDirectory = ".circleci"
+  local file = io.open(circleDirectory, "r")
+  return file ~= nil and io.close(file)
+end
+
+local function getRemoteOriginUrl(repoRoot)
   repoRoot = string.gsub(repoRoot, "\n", "")
   local configFilePath = repoRoot .. "/.git/config"
   local file = io.open(configFilePath, "r")
@@ -59,14 +69,18 @@ M.setup = function()
   -- you can also put some validation here for those.
 
   -- Usage
-  local remoteOriginUrl = getRemoteOriginUrl()
-  if remoteOriginUrl then
-    local projectSlug = formatRemoteOriginToProjectSlug(remoteOriginUrl)
-    if projectSlug then
-      config.config = { project_slug = projectSlug }
+  local repoRoot = getTopLevelOfRepo()
+  if checkForCircleCIConfig(repoRoot) then
+    local remoteOriginUrl = getRemoteOriginUrl(repoRoot)
+    if remoteOriginUrl then
+      local projectSlug = formatRemoteOriginToProjectSlug(remoteOriginUrl)
+      if projectSlug then
+        require("telescope").load_extension("circleci")
+        config.config = { project_slug = projectSlug }
+      end
+    else
+      print("Error opening git config file")
     end
-  else
-    print("Error opening git config file")
   end
 end
 
