@@ -4,11 +4,70 @@ local config = require("nvim-circleci.config")
 
 local M = {}
 
+local providerMap = {
+    ["git@github.com"] = "gh",
+    -- Untested
+    ["git@gitlab.com"] = "gl",
+    ["git@bitbucket.org"] = "bb",
+}
+
+local function getRemoteOriginUrl()
+  local handle = io.popen("git rev-parse --show-toplevel")
+  local repoRoot = handle:read("*a")
+  handle:close()
+  repoRoot = string.gsub(repoRoot, "\n", "")
+  local configFilePath = repoRoot .. "/.git/config"
+  local file = io.open(configFilePath, "r")
+  if not file then
+    local parentPath = string.match(repoRoot, "(.*/)")
+    local parentConfigPath = parentPath .. "config"
+    file = io.open(parentConfigPath) -- git worktrees setup
+    if not file then
+      return nil
+    end
+  end
+
+  local url = nil
+  for line in file:lines() do
+    if string.match(line, "^%s*url%s*=") then
+        url = string.match(line, "= (.*)")
+        break
+    end
+  end
+
+  file:close()
+  return url
+end
+
+local function formatRemoteOriginToProjectSlug(remoteOrigin)
+  local firstPart = string.match(remoteOrigin, "^[^:]*")
+
+  local providerPrefix = providerMap[firstPart]
+  if providerPrefix then
+    local formatted = string.gsub(remoteOrigin, firstPart, providerPrefix)
+    formatted = string.gsub(formatted, "%.git$", "")
+    formatted = string.gsub(formatted, ":", "/")
+    return formatted
+  else
+    return remoteOrigin
+  end
+end
+
 -- setup is the public method to setup your plugin
-M.setup = function(args)
+M.setup = function()
   -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
   -- you can also put some validation here for those.
-  config.config = args
+
+  -- Usage
+  local remoteOriginUrl = getRemoteOriginUrl()
+  if remoteOriginUrl then
+    local projectSlug = formatRemoteOriginToProjectSlug(remoteOriginUrl)
+    if projectSlug then
+      config.config = { project_slug = projectSlug }
+    end
+  else
+    print("Error opening git config file")
+  end
 end
 
 --[[ M.getMyPipelines = function()

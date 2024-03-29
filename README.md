@@ -10,14 +10,7 @@ Ensure you have a CircleCI user token in your macOS keychain (sorry, does not su
 1. Go to https://app.circleci.com/settings/user/tokens
 2. Run this command `security add-generic-password -a $USER -s "circleci" -D "environment variable"  -w <your token>` to add the token to your keychain
 
-In vimrc/init.lua add:
-```
-require('nvim-circleci').setup{
-  project_slug = '<your project slug>'
-}
-```
-
-where `project_slug` comes from Circle in the format `vcs-slug/org-name/repo-name`. For example, `gh/facebook/react'.
+Currently this plugin only officially supports Github as the source control provider for the project on CircleCI. Gitlab and Bitbucket are in the `providerMap` in [`lua/nvim-circleci.lua`](https://github.com/tomoakley/circleci.nvim/blob/main/lua/nvim-circleci.lua), but I am unable to test them. If they don't work, please open an issue, or even better make a pull request with a fix!
 
 ## Telescope
 To activate the Telescope extension add this to your vimrc:
