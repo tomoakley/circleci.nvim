@@ -15,6 +15,7 @@ local function getTopLevelOfRepo()
   local handle = io.popen("git rev-parse --show-toplevel")
   local repoRoot = handle:read("*a")
   handle:close()
+  repoRoot = string.gsub(repoRoot, "\n", "")
   return repoRoot
 end
 
@@ -25,7 +26,6 @@ local function checkForCircleCIConfig(root)
 end
 
 local function getRemoteOriginUrl(repoRoot)
-  repoRoot = string.gsub(repoRoot, "\n", "")
   local configFilePath = repoRoot .. "/.git/config"
   local file = io.open(configFilePath, "r")
   if not file then
@@ -64,10 +64,11 @@ local function formatRemoteOriginToProjectSlug(remoteOrigin)
 end
 
 -- setup is the public method to setup your plugin
-M.setup = function()
+M.setup = function(args)
   -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
   -- you can also put some validation here for those.
 
+  config.config = args
   -- Usage
   local repoRoot = getTopLevelOfRepo()
   if checkForCircleCIConfig(repoRoot) then
@@ -80,6 +81,11 @@ M.setup = function()
       end
     else
       print("Error opening git config file")
+    end
+
+    local lspConfig = args.lsp or { enable = false }
+    if lspConfig.enable then
+      require("nvim-circleci.lsp").start(lspConfig.config, repoRoot)
     end
   end
 end

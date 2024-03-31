@@ -14,7 +14,26 @@ In your neovim config file, add:
 ```
 circleci.setup()
 ```
-There are currently no config options available.
+
+To enable the [CircleCI YAML Language Server](https://github.com/CircleCI-Public/circleci-yaml-language-server), add some config to the setup call:
+```
+circleci.setup{
+  lsp = {
+    enable = true
+  }
+}
+```
+There are further config options available for the LSP:
+```
+  lsp = {
+    enable = true,
+    cmd = "" -- the LSP executable command
+    on_attach = function(client, bufnr)
+      -- function that gets called when the LSP client attaches
+    end
+  }
+```
+The recommended way to install the language server is using [Mason.nvim](https://github.com/williamboman/mason.nvim). Run `:Mason`, search for circleci-yaml-language-server and press I to install. The plugin will look in the mason packages directory for the LSP executable by default. If you want to install it elsewhere (for example on your $PATH), provide the `cmd` option in the `config.lsp` object.
 
 Currently this plugin only officially supports Github as the source control provider for the project on CircleCI. Gitlab and Bitbucket are in the `providerMap` in [`lua/nvim-circleci.lua`](https://github.com/tomoakley/circleci.nvim/blob/main/lua/nvim-circleci.lua), but I am unable to test them. If they don't work, please open an issue, or even better make a pull request with a fix!
 
