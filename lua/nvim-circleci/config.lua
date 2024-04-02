@@ -8,6 +8,7 @@ M.config = {
       exec_path = nil,
       on_attach = nil,
       cmd = nil,
+      enable_yaml = false
     }
   }
 }
