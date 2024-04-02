@@ -77,14 +77,13 @@ function auth.getWorkflowJobs(id)
   return items
 end
 
-function auth.getWorkflowForBranch(sender, branch)
+function auth.getWorkflowForBranch(branch)
   local pipelines = auth.getAllPipelineIds()
-  -- local branchWorkflows = {}
+  local branchWorkflows = {}
   for key,item in pairs(pipelines) do
     if (item.branch == branch) then
       local workflow = auth.getWorkflowById(item.id)
-      -- branchWorkflows[#branchWorkflows+1] = workflow
-      sender(workflow)
+      branchWorkflows[#branchWorkflows+1] = workflow
     end
   end
 end

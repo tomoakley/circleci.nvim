@@ -118,6 +118,53 @@ local get_pipelines = function(opts, mineOrAll)
   }):find()
 end
 
+local get_workflows_for_branch = function(opts, branch)
+  local workflows = {}
+  vim.defer_fn(function()
+    workflows = auth.getWorkflowForBranch(branch)
+  end)
+  local widths = {
+    workflow = 36,
+    number = 6,
+  }
+  local displayer = require("telescope.pickers.entry_display").create {
+        separator = " ",
+        items = {
+            { width = widths.number },
+            { remaining = true },
+        },
+    }
+  local make_display = function(entry)
+    -- local workflow = auth.getWorkflowById(entry.id)
+    return displayer {
+      { tostring(entry.number), "TelescopeResultsNumber" },
+      { entry.name, remaining = true },
+    }
+  end
+  pickers.new(opts or {}, {
+    prompt_title = "Workflows",
+    finder = finders.new_table {
+      results = workflows,
+      entry_maker = function(entry)
+          entry.value = entry.name
+          entry.ordinal = tostring(entry.number)
+          entry.display = make_display
+          return entry
+      end,
+    },
+    sorter = conf.generic_sorter(opts),
+    -- previewer = conf.file_previewer(opts),
+      attach_mappings = function(_, map)
+        --action_set.select:replace(open_branch_workflows_in_browser)
+        action_set.select:replace(function(prompt_bufnr, type)
+          open_preview_buffer(type)(prompt_bufnr)
+        end)
+        map("i", "<c-b>", open_branch_workflows_in_browser)
+        return true
+      end
+  })
+end
+
 return require("telescope").register_extension({
   exports = {
       get_my_pipelines = function(opts)
@@ -126,5 +173,11 @@ return require("telescope").register_extension({
       get_all_pipelines = function(opts)
         get_pipelines(opts, "all")
       end,
+      get_workflows_for_branch = function(opts)
+        get_workflows_for_branch(opts, "bouncing-icon")
+      end
+      -- get_workflows_for_current_branch
+      -- get_master_workflows
+      -- get_workflows_for_branch
   }
 })
