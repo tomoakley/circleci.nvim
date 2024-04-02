@@ -85,7 +85,10 @@ M.setup = function(args)
 
     local lspConfig = args.lsp or { enable = false }
     if lspConfig.enable then
-      require("nvim-circleci.lsp").start(lspConfig.config, repoRoot)
+      require("nvim-circleci.lsp").start("CircleCI Language Server", lspConfig.config, repoRoot)
+      if lspConfig.config.enable_yaml then
+        require("nvim-circleci.lsp").start("Yaml Language Server", lspConfig.config, repoRoot)
+      end
     end
   end
 end
