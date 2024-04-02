@@ -29,13 +29,15 @@ There are further config options available for the LSP:
 ```
   lsp = {
     enable = true,
-    cmd = "" -- the LSP executable command
-    on_attach = function(client, bufnr)
-      -- function that gets called when the LSP client attaches
-    end
+    config = {
+      exec_path = "",
+      cmd = {}, -- the LSP executable command in list form
+      on_attach = function(client, bufnr) -- function that gets called when the LSP client attaches
+    }
   }
 ```
-The recommended way to install the language server is using [Mason.nvim](https://github.com/williamboman/mason.nvim). Run `:Mason`, search for circleci-yaml-language-server and press I to install. The plugin will look in the mason packages directory for the LSP executable by default. If you want to install it elsewhere (for example on your $PATH), provide the `cmd` option in the `config.lsp` object.
+The recommended way to install the language server is using [Mason.nvim](https://github.com/williamboman/mason.nvim). Run `:Mason`, search for circleci-yaml-language-server and press I to install. The plugin will look in the mason packages directory for the LSP executable by default.
+If you want to install it elsewhere (for example on your $PATH), there are two options: either provide the `cmd` option in the `config.lsp` object, in the form of a list of strings with the required flags. You can also provide the `exec_path` - provide the path to the directory where the executable lives and the plugin will add the required flags.
 
 Currently this plugin only officially supports Github as the source control provider for the project on CircleCI. Gitlab and Bitbucket are in the `providerMap` in [`lua/nvim-circleci.lua`](https://github.com/tomoakley/circleci.nvim/blob/main/lua/nvim-circleci.lua), but I am unable to test them. If they don't work, please open an issue, or even better make a pull request with a fix!
 

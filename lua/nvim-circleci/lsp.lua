@@ -25,12 +25,12 @@ M.start = function(userConfig, rootDir)
 end
 
 M.config = function(userConfig, rootDir)
-  local lspCmd = userConfig.cmd or (vim.fn.stdpath('data') .. '/mason/packages/circleci-yaml-language-server/darwin-arm64-lsp')
+  local packagePath = userConfig.exec_path or (vim.fn.stdpath('data') .. '/mason/packages/circleci-yaml-language-server')
+  local defaultCmd = {packagePath .. '/darwin-arm64-lsp', '-schema='..packagePath..'/schema.json', '--stdio'}
   local server_opts = {
     params = {
       name = 'CircleCI config helper',
-      cmd = { lspCmd, '-schema='..rootDir..'/.circleci/config.yml', '--stdio'
-      },
+      cmd = { unpack(userConfig.cmd or defaultCmd) },
       capabilities = vim.lsp.protocol.make_client_capabilities(),
       on_attach = function(client, bufnr)
         vim.bo.omnifunc = 'v:lua.vim.lsp.omnifunc'

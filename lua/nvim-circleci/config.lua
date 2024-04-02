@@ -5,8 +5,9 @@ M.config = {
   lsp = {
     enable = false,
     config = {
+      exec_path = nil,
       on_attach = nil,
-      cmd = nil
+      cmd = nil,
     }
   }
 }
