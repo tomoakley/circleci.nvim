@@ -9,6 +9,7 @@ local action_state = require "telescope.actions.state"
 
 local auth = require'nvim-circleci.auth'
 local utils = require'nvim-circleci.utils'
+local config = require'nvim-circleci.config'
 --local previewers = require 'nvim-circleci.telescope.previewers'
 
 local function open_preview_buffer(command)
@@ -29,14 +30,20 @@ local function open_preview_buffer(command)
   end
 end
 
+local workflowData = {}
+
 local open_branch_workflows_in_browser = function()
-    local entry = action_state.get_selected_entry()
-    print(vim.inspect(entry))
+  local entry = action_state.get_selected_entry()
+  if not workflowData.id then return end
+  local project_slug = config.config['project_slug']
+  local url = 'https://app.circleci.com/pipelines/'..project_slug..'/'..entry.number..'/workflows/'..workflowData['id']
+  vim.fn.jobstart({"open", url}, {detach = true})
 end
 
 local createPreview = function(bufnr, entry)
   vim.defer_fn(function()
     local workflow = auth.getWorkflowById(entry.id)
+    workflowData = workflow[1]
     for k,v in ipairs(workflow) do
       vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
         '%s, %s', v["name"], v["status"]
@@ -92,14 +99,14 @@ local get_pipelines = function(opts, mineOrAll)
     },
     sorter = conf.generic_sorter(opts),
     -- previewer = conf.file_previewer(opts),
-      attach_mappings = function(_, map)
-        --action_set.select:replace(open_branch_workflows_in_browser)
-        action_set.select:replace(function(prompt_bufnr, type)
-          open_preview_buffer(type)(prompt_bufnr)
-        end)
-        map("i", "<c-b>", open_branch_workflows_in_browser)
-        return true
-      end,
+    attach_mappings = function(_, map)
+      --action_set.select:replace(open_branch_workflows_in_browser)
+      map("i", config.config.mappings['open_in_browser'], open_branch_workflows_in_browser)
+      action_set.select:replace(function(prompt_bufnr, type)
+        open_preview_buffer(type)(prompt_bufnr)
+      end)
+      return true
+    end,
     previewer = previewers.new_buffer_previewer{
       title = 'Workflow Preview',
       keep_last_buf = true,

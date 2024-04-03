@@ -17,6 +17,7 @@ In your neovim config file, add:
 circleci.setup()
 ```
 
+### LSP
 To enable the [CircleCI YAML Language Server](https://github.com/CircleCI-Public/circleci-yaml-language-server), add some config to the setup call:
 ```
 circleci.setup{
@@ -24,6 +25,7 @@ circleci.setup{
     enable = true
   }
 }
+
 ```
 There are further config options available for the LSP:
 ```
@@ -61,4 +63,11 @@ To show all the projects pipelines from every user, run this command:
 lua require('telescope').extensions.circleci.get_all_pipelines()
 ```
 
-
+To open a pipeline or workflow in a browser, use `<C-o>` while in the picker. To modify this mapping, pass in this config to the `circleci.setup()` method:
+```
+{
+  "mappings" = {
+    "open_in_browser" = "<C-a>" -- pass new mapping here
+  }
+}
+```

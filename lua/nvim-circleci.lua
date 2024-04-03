@@ -68,7 +68,7 @@ M.setup = function(args)
   -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
   -- you can also put some validation here for those.
 
-  config.config = args
+  config.mergeConfig(config.config, args)
   -- Usage
   local repoRoot = getTopLevelOfRepo()
   if checkForCircleCIConfig(repoRoot) then
@@ -77,7 +77,7 @@ M.setup = function(args)
       local projectSlug = formatRemoteOriginToProjectSlug(remoteOriginUrl)
       if projectSlug then
         require("telescope").load_extension("circleci")
-        config.config = { project_slug = projectSlug }
+        config.config.project_slug = projectSlug
       end
     else
       print("Error opening git config file")
