@@ -9,6 +9,7 @@ local action_state = require "telescope.actions.state"
 
 local auth = require'nvim-circleci.auth'
 local utils = require'nvim-circleci.utils'
+local config = require'nvim-circleci.config'
 --local previewers = require 'nvim-circleci.telescope.previewers'
 
 local function open_preview_buffer(command)
@@ -33,14 +34,16 @@ local workflowData = {}
 
 local open_branch_workflows_in_browser = function()
   local entry = action_state.get_selected_entry()
-  local url = 'https://app.circleci.com/pipelines'
+  if not workflowData.id then return end
+  local project_slug = config.config['project_slug']
+  local url = 'https://app.circleci.com/pipelines/'..project_slug..'/'..entry.number..'/workflows/'..workflowData['id']
   vim.fn.jobstart({"open", url}, {detach = true})
 end
 
 local createPreview = function(bufnr, entry)
   vim.defer_fn(function()
     local workflow = auth.getWorkflowById(entry.id)
-    workflowData(workflow[1])
+    workflowData = workflow[1]
     for k,v in ipairs(workflow) do
       vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
         '%s, %s', v["name"], v["status"]

@@ -77,7 +77,7 @@ M.setup = function(args)
       local projectSlug = formatRemoteOriginToProjectSlug(remoteOriginUrl)
       if projectSlug then
         require("telescope").load_extension("circleci")
-        config.config = { project_slug = projectSlug }
+        config.config.project_slug = projectSlug
       end
     else
       print("Error opening git config file")
