@@ -37,6 +37,7 @@ local function getYamlLanguageServerConfig(userConfig)
         },
       }
     },
+    filetypes = {'yaml', 'yml'}
   }
 end
 
@@ -56,7 +57,7 @@ M.start = function(lsName, userConfig, rootDir)
   end
 
   state.autocmd[id] = autocmd('BufEnter', {
-    pattern = '*',
+    pattern = {'*.yaml', '*.yml'},
     group = augroup,
     desc = fmt('Attach LSP: %s', lsName),
     callback = function()
