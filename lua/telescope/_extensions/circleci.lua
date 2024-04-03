@@ -101,12 +101,12 @@ local get_pipelines = function(opts, mineOrAll)
     -- previewer = conf.file_previewer(opts),
     attach_mappings = function(_, map)
       --action_set.select:replace(open_branch_workflows_in_browser)
+      map("i", config.config.mappings['open_in_browser'], open_branch_workflows_in_browser)
       action_set.select:replace(function(prompt_bufnr, type)
         open_preview_buffer(type)(prompt_bufnr)
       end)
-      map("i", "<c-b>", open_branch_workflows_in_browser)
       return true
-      end,
+    end,
     previewer = previewers.new_buffer_previewer{
       title = 'Workflow Preview',
       keep_last_buf = true,

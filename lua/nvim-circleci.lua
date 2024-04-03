@@ -68,7 +68,7 @@ M.setup = function(args)
   -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
   -- you can also put some validation here for those.
 
-  config.config = args
+  config.mergeConfig(config.config, args)
   -- Usage
   local repoRoot = getTopLevelOfRepo()
   if checkForCircleCIConfig(repoRoot) then
