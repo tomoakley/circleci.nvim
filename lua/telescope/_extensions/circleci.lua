@@ -92,7 +92,7 @@ local get_pipelines = function(opts, mineOrAll)
       results = pipelines,
       entry_maker = function(entry)
           entry.value = entry.branch
-          entry.ordinal = tostring(entry.number)
+          entry.ordinal = tostring(entry.number) .. " " .. (entry.branch or "") .. " " .. entry.user
           entry.display = make_display
           return entry
       end,
