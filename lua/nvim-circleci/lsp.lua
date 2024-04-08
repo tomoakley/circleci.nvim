@@ -1,5 +1,5 @@
 local auth = require"nvim-circleci.auth"
-local config = require"nvim-circleci.config"
+local configArgs = require"nvim-circleci.config"
 local M = {}
 local state = {autocmd = {}}
 
@@ -25,14 +25,12 @@ local function getCircleCILanguageServerConfig(userConfig)
         command = "setToken",
         arguments = {auth.token}
       }, function(err, result, ctx)
-        print('success ', result, ', error: ', err)
       end)
-      if config.config.selfHostedUrl then
+      if configArgs.config.selfHostedUrl then
         client.request('workspace/executeCommand', {
           command = "setSelfHostedUrl",
-          arguments = {config.config.selfHostedUrl}
+          arguments = {configArgs.config.selfHostedUrl}
         }, function(err, result, ctx)
-          print('success ', result, ', error: ', err)
         end)
       end
     end
