@@ -1,3 +1,5 @@
+local auth = require"nvim-circleci.auth"
+local config = require"nvim-circleci.config"
 local M = {}
 local state = {autocmd = {}}
 
@@ -18,6 +20,22 @@ local function getCircleCILanguageServerConfig(userConfig)
         user_on_attach(client, bufnr)
       end
     end,
+    on_init = function(client, results)
+      client.request('workspace/executeCommand', {
+        command = "setToken",
+        arguments = {auth.token}
+      }, function(err, result, ctx)
+        print('success ', result, ', error: ', err)
+      end)
+      if config.config.selfHostedUrl then
+        client.request('workspace/executeCommand', {
+          command = "setSelfHostedUrl",
+          arguments = {config.config.selfHostedUrl}
+        }, function(err, result, ctx)
+          print('success ', result, ', error: ', err)
+        end)
+      end
+    end
   }
 end
 
@@ -68,10 +86,14 @@ end
 
 M.config = function(lsName, userConfig, rootDir)
   local server_opts = getConfigMethodForLS[lsName](userConfig)
+  local on_init = server_opts.on_init
   server_opts.name = lsName
   server_opts.root_dir = rootDir
   server_opts.on_exit = M.on_exit
-  server_opts.on_init = M.on_init
+  server_opts.on_init = function(client, results)
+    if on_init then on_init(client, results) end
+    M.on_init(client, results)
+  end
   server_opts.capabilities = vim.lsp.protocol.make_client_capabilities()
 
   return server_opts

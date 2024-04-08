@@ -3,16 +3,17 @@ local curl = require "plenary.curl"
 local config = require"nvim-circleci.config"
 
 function auth.get_circle_token()
+  if auth.token then return auth.token end
   local result = vim.fn.system('security find-generic-password -w -a ${USER} -D "environment variable" -s "circleci"')
   return string.gsub(result, '\n', '')
 end
 
-local token = auth.get_circle_token()
+auth.token = auth.get_circle_token()
 
 local function makeRequest(method, url)
   local headers = {
     ['content-type'] = "application/json",
-    ['Circle-Token'] = token
+    ['Circle-Token'] = auth.token
   }
   local opts = {
     url = string.format('https://circleci.com/api/v2/%s', url),

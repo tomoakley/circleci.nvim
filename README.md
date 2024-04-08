@@ -50,6 +50,8 @@ Alternatively you can do this yourself in your own config using [nvim-lspconfig]
 
 Currently this plugin only officially supports Github as the source control provider for the project on CircleCI. Gitlab and Bitbucket are in the `providerMap` in [`lua/nvim-circleci.lua`](https://github.com/tomoakley/circleci.nvim/blob/main/lua/nvim-circleci.lua), but I am unable to test them. If they don't work, please open an issue, or even better make a pull request with a fix!
 
+If you self-host your own CircleCI infrastructure, you can pass the config variable `selfHostedUrl` to set that.
+
 ## Telescope
 The Telescope extension is only activated by the plugin if the project root has a `.circleci` directory.
 
