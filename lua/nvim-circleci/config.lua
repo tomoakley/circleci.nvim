@@ -2,6 +2,7 @@ local M = {}
 
 M.config = {
   project_slug = '',
+  selfHostedUrl = nil,
   mappings = {
     open_in_browser = '<C-o>'
   },
