@@ -1,19 +1,19 @@
-local auth = {}
+local api = {}
 local curl = require "plenary.curl"
 local config = require"nvim-circleci.config"
 
-function auth.get_circle_token()
-  if auth.token then return auth.token end
+function api.get_circle_token()
+  if api.token then return api.token end
   local result = vim.fn.system('security find-generic-password -w -a ${USER} -D "environment variable" -s "circleci"')
   return string.gsub(result, '\n', '')
 end
 
-auth.token = auth.get_circle_token()
+api.token = api.get_circle_token()
 
 local function makeRequest(method, url)
   local headers = {
     ['content-type'] = "application/json",
-    ['Circle-Token'] = auth.token
+    ['Circle-Token'] = api.token
   }
   local opts = {
     url = string.format('https://circleci.com/api/v2/%s', url),
@@ -24,7 +24,7 @@ local function makeRequest(method, url)
   return res.body
 end
 
-function auth.getMyPipelineIds()
+function api.getMyPipelineIds()
   local pipelineIds = {}
   local response = makeRequest("GET", string.format("project/%s/pipeline/mine", config.config['project_slug']))
   local data = vim.json.decode(response)
@@ -38,7 +38,7 @@ function auth.getMyPipelineIds()
   return pipelineIds
 end
 
-function auth.getAllPipelineIds()
+function api.getAllPipelineIds()
   local pipelineIds = {}
   local response = makeRequest("GET", string.format("project/%s/pipeline", config.config['project_slug']))
   local data = vim.json.decode(response)
@@ -52,7 +52,7 @@ function auth.getAllPipelineIds()
   return pipelineIds
 end
 
-function auth.getWorkflowById(id)
+function api.getWorkflowById(id)
   local response = makeRequest("GET", string.format("pipeline/%s/workflow", id))
   local data = vim.json.decode(response)
   local workflowData = {}
@@ -66,7 +66,7 @@ function auth.getWorkflowById(id)
   return workflowData
 end
 
-function auth.getWorkflowJobs(id)
+function api.getWorkflowJobs(id)
   local response = makeRequest("GET", string.format("workflow/%s/job", id))
   local data = vim.json.decode(response)
   local items = {}
@@ -78,19 +78,19 @@ function auth.getWorkflowJobs(id)
   return items
 end
 
-function auth.getWorkflowForBranch(sender, branch)
-  local pipelines = auth.getAllPipelineIds()
+function api.getWorkflowForBranch(sender, branch)
+  local pipelines = api.getAllPipelineIds()
   -- local branchWorkflows = {}
   for key,item in pairs(pipelines) do
     if (item.branch == branch) then
-      local workflow = auth.getWorkflowById(item.id)
+      local workflow = api.getWorkflowById(item.id)
       -- branchWorkflows[#branchWorkflows+1] = workflow
       sender(workflow)
     end
   end
 end
 
-function auth.openJobUrl(number)
+function api.openJobUrl(number)
   local response = makeRequest("GET", string.format("project/%s/job/%s", config.config['project_slug'], number))
   local data = vim.json.decode(response)
   for k,v in pairs(data) do
@@ -100,9 +100,9 @@ function auth.openJobUrl(number)
   end
 end
 
-function auth.run(request, params, cb)
+function api.run(request, params, cb)
   cb(request(params))
 end
 
 
-return auth
+return api

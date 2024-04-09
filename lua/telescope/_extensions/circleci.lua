@@ -7,7 +7,7 @@ local previewers = require("telescope.previewers")
 local action_set = require "telescope.actions.set"
 local action_state = require "telescope.actions.state"
 
-local auth = require'nvim-circleci.auth'
+local api = require'nvim-circleci.api'
 local utils = require'nvim-circleci.utils'
 local config = require'nvim-circleci.config'
 --local previewers = require 'nvim-circleci.telescope.previewers'
@@ -42,13 +42,13 @@ end
 
 local createPreview = function(bufnr, entry)
   vim.defer_fn(function()
-    local workflow = auth.getWorkflowById(entry.id)
+    local workflow = api.getWorkflowById(entry.id)
     workflowData = workflow[1]
     for k,v in ipairs(workflow) do
       vim.api.nvim_buf_set_lines(bufnr, 0, k+1, false, {string.format(
         '%s, %s', v["name"], v["status"]
       )})
-      auth.run(auth.getWorkflowJobs, v['id'], function(workflowJobs)
+      api.run(api.getWorkflowJobs, v['id'], function(workflowJobs)
           for jobsKey, jobsValue in ipairs(workflowJobs) do
             vim.api.nvim_buf_set_lines(bufnr, k+jobsKey-1, k+jobsKey, false, {string.format(
               '    %s, %s, %s, %s', jobsValue["name"], jobsValue["status"], jobsValue['job_number'], jobsValue['started_at']
@@ -61,7 +61,7 @@ end
 
 local get_pipelines = function(opts, mineOrAll)
   opts = opts or {}
-  local pipelines = mineOrAll == "mine" and auth.getMyPipelineIds() or auth.getAllPipelineIds()
+  local pipelines = mineOrAll == "mine" and api.getMyPipelineIds() or api.getAllPipelineIds()
   local widths = {
     branch = 20,
     user = 16,
@@ -78,7 +78,7 @@ local get_pipelines = function(opts, mineOrAll)
         },
     }
   local make_display = function(entry)
-    -- local workflow = auth.getWorkflowById(entry.id)
+    -- local workflow = api.getWorkflowById(entry.id)
     return displayer {
       { tostring(entry.number), "TelescopeResultsNumber" },
       { entry.branch, remaining = true },
